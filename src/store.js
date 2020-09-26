@@ -72,7 +72,7 @@ export default new Vuex.Store({
       try {
         const config = {
           method: 'get',
-          url: 'http://localhost:3000/voter',
+          url: 'http://35.154.42.4:3000/voter',
         };
         const {data} = await axios(config);
         commit('setCandidates', data);
@@ -85,7 +85,7 @@ export default new Vuex.Store({
       try {
         const config = {
           method: 'get',
-          url: 'http://localhost:3000/voter/checkIp',
+          url: 'http://35.154.42.4:3000/voter/checkIp',
         };
         const {data} = await axios(config);
         commit('setHasVoted', data);
@@ -98,7 +98,7 @@ export default new Vuex.Store({
       try {
         const config = {
           method: 'post',
-          url: 'http://localhost:3000/voter',
+          url: 'http://35.154.42.4:3000/voter',
           data: payload,
         };
         axios(config);
@@ -112,7 +112,7 @@ export default new Vuex.Store({
     async login({commit}, payload) {
       const config = {
         method: 'post',
-        url: `http://localhost:3000/${payload.type}/login`,
+        url: `http://35.154.42.4:3000/${payload.type}/login`,
         data: payload.form,
       };
       try{
@@ -142,14 +142,24 @@ export default new Vuex.Store({
         }
       }
     },
-    logout({commit}, type) {
-      if(type === 'admin') {
-        sessionStorage.removeItem('adminSessionKey');
-        commit('setIsAdminLoggedIn', false);
-      }
-      else if(type === 'candidate') {
-        sessionStorage.removeItem('candidateSessionKey');
-        commit('setIsCandidateLoggedIn', false);
+    logout({commit}, type) {  
+      const config = {
+        method: 'post',
+        url: `http://35.154.42.4:3000/${type}/logout`,
+        data: {key: sessionStorage.getItem(`${type}SessionKey`)},
+      };
+      try{
+        axios(config);
+        if(type === 'admin') {
+          sessionStorage.removeItem('adminSessionKey');
+          commit('setIsAdminLoggedIn', false);
+        }
+        else if(type === 'candidate') {
+          sessionStorage.removeItem('candidateSessionKey');
+          commit('setIsCandidateLoggedIn', false);
+        }
+      } catch (error) {
+        console.error('Logout Failed');
       }
     },
     deleteCandidateAccount({state, commit}, candidateName) {
@@ -160,7 +170,7 @@ export default new Vuex.Store({
         const key = sessionStorage.getItem('adminSessionKey');
         const config = {
           method: 'post',
-          url: 'http://localhost:3000/admin/delete',
+          url: 'http://35.154.42.4:3000/admin/delete',
           data: {adminSessionKey: key, name: candidateName},
         };
         axios(config);
@@ -177,7 +187,7 @@ export default new Vuex.Store({
         const key = sessionStorage.getItem('adminSessionKey');
         const config = {
           method: 'put',
-          url: 'http://localhost:3000/admin',
+          url: 'http://35.154.42.4:3000/admin',
           data: {adminSessionKey: key, payload},
         };
         axios(config);
@@ -192,7 +202,7 @@ export default new Vuex.Store({
         const key = sessionStorage.getItem('candidateSessionKey');
         const config = {
           method: 'post',
-          url: 'http://localhost:3000/candidate',
+          url: 'http://35.154.42.4:3000/candidate',
           data: {candidateSessionKey: key, payload},
         };
         axios(config);
